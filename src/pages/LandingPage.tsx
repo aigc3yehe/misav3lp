@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentAgent } from '../store/slices/agentSlice';
 import livingroomIcon from '../assets/livingroom.svg';
 import pointingCursor from '../assets/pointer.png';
-import logoImage from '../assets/mirae_studio.png';
+import logoImage from '../assets/logo.svg';
 import enterIcon from '../assets/uil_enter.svg';
 import { useState, useEffect, useRef } from 'react';
 import lineSvg from '../assets/line.svg';
 import { RootState } from '../store';
 import { hideToast, showToast } from '../store/slices/toastSlice';
+import { setRem, pxToRem } from '../utils/rem';
 
 const PageContainer = styled(Box)({
   width: '100vw',
@@ -23,29 +24,29 @@ const PageContainer = styled(Box)({
 });
 
 const Header = styled(Box)({
-  height: 103,
+  height: '6.44rem',
   width: '100%',
-  padding: '30px 40px',
+  padding: '1.875rem 2.5rem',
   display: 'flex',
   alignItems: 'center',
 });
 
 const Logo = styled('img')({
-  width: 93,
-  height: 35,
+  width: pxToRem(100),
+  height: pxToRem(35),
 });
 
 const Content = styled(Box)({
-  height: 606,
+  height: '37.875rem',
   position: 'relative',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: '32px',
+  gap: '2rem',
   overflow: 'hidden',
-  paddingLeft: 60,
+  paddingLeft: '3.75rem',
   '@media (min-width: 1920px)': {
-    paddingLeft: 200,
+    paddingLeft: '12.5rem',
   }
 });
 
@@ -57,40 +58,40 @@ const ContentInner = styled(Box)({
 
 const BackgroundContainer = styled(Box)({
   position: 'absolute',
-  top: 312,
+  top: '19.5rem',
   left: '50%',
   transform: 'translateX(-50%)',
   width: '300vw',
-  height: 129,
+  height: '8.063rem',
   display: 'flex',
   justifyContent: 'center',
 });
 
 const BackgroundLine = styled('img')({
-  height: 129,
-  transform: 'translateX(356px)',
+  height: '8.063rem',
+  transform: 'translateX(22.25rem)',
 });
 
 const BackgroundLine2 = styled('img')({
-    height: 129,
+  height: '8.063rem',
 });
 
 const BackgroundLine3 = styled('img')({
-    height: 129,
-    transform: 'translateX(-356px)',
+  height: '8.063rem',
+  transform: 'translateX(-22.25rem)',
 });
 
 const CardsContainer = styled(Box)({
-    position: 'absolute',
-    top: 143,
-    left: 607,
-    display: 'flex',
-    gap: '25px',
-    zIndex: 1,
+  position: 'absolute',
+  top: '8.938rem',
+  left: '37.938rem',
+  display: 'flex',
+  gap: '1.563rem',
+  zIndex: 1,
 });
 
 const Footer = styled(Box)({
-  height: 143,
+  height: pxToRem(143),
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -99,23 +100,23 @@ const Footer = styled(Box)({
 const InputContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'focused'
 })<{ focused: boolean }>(({ focused }) => ({
-  width: 874,
-  height: 63,
+  width: pxToRem(874),
+  height: pxToRem(63),
   backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  borderRadius: 8,
-  padding: '15px 25px',
+  borderRadius: pxToRem(8),
+  padding: pxToRem(15) + ' ' + pxToRem(25),
   display: 'flex',
   alignItems: 'center',
-  gap: '14px',
+  gap: pxToRem(14),
   border: focused ? '1px solid #C9ACFF' : '1px solid rgba(0, 0, 0, 0.8)',
   transition: 'border 0.2s ease',
 }));
 
 const StyledInput = styled(InputBase)({
-  width: 669,
-  height: 20,
+  width: pxToRem(874),
+  height: pxToRem(63),
   color: '#D6C0FF',
-  fontSize: 14,
+  fontSize: pxToRem(14),
   lineHeight: '140%',
   '& .MuiInputBase-input': {
     padding: 0,
@@ -125,14 +126,14 @@ const StyledInput = styled(InputBase)({
 const GenerateButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'hasContent'
 })<{ hasContent: boolean }>(({ hasContent }) => ({
-  width: 141,
-  height: 35,
-  borderRadius: 4,
+  width: pxToRem(141),
+  height: pxToRem(35),
+  borderRadius: pxToRem(4),
   backgroundColor: hasContent ? 'rgba(199, 255, 140, 0.1)' : 'transparent',
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
-  padding: '5px 16px',
+  gap: pxToRem(8),
+  padding: pxToRem(5) + ' ' + pxToRem(16),
   textTransform: 'none',
   '&:hover': {
     backgroundColor: hasContent ? 'rgba(199, 255, 140, 0.2)' : 'transparent',
@@ -140,12 +141,12 @@ const GenerateButton = styled(Button, {
 }));
 
 const EnterIcon = styled('img')({
-  width: 24,
-  height: 24,
+  width: pxToRem(24),
+  height: pxToRem(24),
 });
 
 const ButtonText = styled('span')({
-  fontSize: 18,
+  fontSize: pxToRem(18),
   lineHeight: '140%',
   color: '#C7FF8C',
   fontWeight: 400,
@@ -153,17 +154,17 @@ const ButtonText = styled('span')({
 });
 
 const AgentCard = styled(Card)({
-  width: 332,
-  height: 363,
-  padding: 20,
-  borderRadius: 4,
+  width: '20.75rem',
+  height: '22.688rem',
+  padding: '1.25rem',
+  borderRadius: '0.25rem',
   backgroundColor: '#A276FF',
   backgroundImage: `linear-gradient(135deg, #9a6bff 25%, transparent 25%), 
                    linear-gradient(225deg, #9a6bff 25%, transparent 25%), 
                    linear-gradient(45deg, #9a6bff 25%, transparent 25%), 
                    linear-gradient(315deg, #9a6bff 25%, #A276FF 25%)`,
-  backgroundPosition: '40px 0, 40px 0, 0 0, 0 0',
-  backgroundSize: '80px 80px',
+  backgroundPosition: `${pxToRem(40)} 0, ${pxToRem(40)} 0, 0 0, 0 0`,
+  backgroundSize: `${pxToRem(80)} ${pxToRem(80)}`,
   backgroundRepeat: 'repeat',
   cursor: `url(${pointingCursor}), pointer`,
   display: 'flex',
@@ -172,17 +173,17 @@ const AgentCard = styled(Card)({
 });
 
 const AgentImage = styled('img')({
-  width: 292,
-  height: 200,
-  borderRadius: 4,
+  width: pxToRem(292),
+  height: pxToRem(200),
+  borderRadius: pxToRem(4),
   objectFit: 'cover',
   display: 'block',
 });
 
 const TextContent = styled(Box)({
-  width: 292,
-  height: 73,
-  padding: '10px 0',
+  width: pxToRem(292),
+  height: pxToRem(73),
+  padding: pxToRem(10) + ' ' + 0,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
@@ -190,23 +191,23 @@ const TextContent = styled(Box)({
 });
 
 const AgentName = styled(Typography)({
-  fontSize: 30,
-  lineHeight: '24px',
+  fontSize: pxToRem(30),
+  lineHeight: pxToRem(24),
   fontWeight: 'bold',
   color: '#000000',
 });
 
 const AgentDescription = styled(Typography)({
-  fontSize: 18,
-  lineHeight: '24px',
+  fontSize: pxToRem(18),
+  lineHeight: pxToRem(24),
   fontWeight: 500,
   color: '#000000',
 });
 
 const ActionButton = styled(Button)<{ disabled?: boolean }>(({ disabled }) => ({
-  width: 292,
-  height: 50,
-  borderRadius: 4,
+  width: pxToRem(292),
+  height: pxToRem(50),
+  borderRadius: pxToRem(4),
   backgroundColor: disabled ? '#AAABB4' : '#C7FF8C',
   display: 'flex',
   alignItems: 'center',
@@ -218,15 +219,15 @@ const ActionButton = styled(Button)<{ disabled?: boolean }>(({ disabled }) => ({
 }));
 
 const ActionText = styled(Typography)<{ disabled?: boolean }>(({ disabled }) => ({
-  fontSize: 20,
-  lineHeight: '24px',
+  fontSize: pxToRem(20),
+  lineHeight: pxToRem(24),
   fontWeight: 'bold',
   color: disabled ? '#636071' : '#000000',
 }));
 
 const ActionIcon = styled('img')({
-  width: 30,
-  height: 30,
+  width: pxToRem(30),
+  height: pxToRem(30),
 });
 
 const agents = [
@@ -261,11 +262,11 @@ const TextContainer = styled(Box)({
 const TitleContainer = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
-  marginBottom: '24px',
+  marginBottom: pxToRem(24),
 });
 
 const TitleText = styled(Typography)({
-  fontSize: 80,
+  fontSize: pxToRem(80),
   lineHeight: '110%',
   fontWeight: 800,
   color: '#FFFFFF',
@@ -277,12 +278,12 @@ const HighlightText = styled('span')({
 
 const DescriptionText = styled(Typography)({
   position: 'absolute',
-  top: 336,
+  top: pxToRem(336),
   left: 0,
   display: 'flex',
   flexDirection: 'column',
-  width: 448,
-  fontSize: 18,
+  width: pxToRem(448),
+  fontSize: pxToRem(18),
   lineHeight: '140%',
   fontWeight: 400,
   color: '#FFFFFF',
@@ -293,10 +294,10 @@ const DescriptionText = styled(Typography)({
 
 const IntegrationText = styled(Typography)({
   position: 'absolute',
-  left: 607,
-  top: 10,
-  width: 574,
-  fontSize: 18,
+  left: pxToRem(607),
+  top: pxToRem(10),
+  width: pxToRem(574),
+  fontSize: pxToRem(18),
   lineHeight: '140%',
   fontWeight: 400,
   color: '#FFFFFF',
@@ -304,10 +305,10 @@ const IntegrationText = styled(Typography)({
 
 const ApplyButton = styled(Button)({
   position: 'absolute',
-  left: 607,
-  top: 71,
-  width: 276,
-  height: 40,
+  left: pxToRem(607),
+  top: pxToRem(71),
+  width: pxToRem(276),
+  height: pxToRem(40),
   borderRadius: 4,
   backgroundColor: 'rgba(0, 0, 0, 0.3)',
   border: '1px solid #FFFFFF',
@@ -322,7 +323,7 @@ const ApplyButton = styled(Button)({
 });
 
 const ApplyButtonText = styled(Typography)({
-  fontSize: 20,
+  fontSize: pxToRem(20),
   lineHeight: '100%',
   fontWeight: 500,
   color: 'inherit',
@@ -355,7 +356,7 @@ const UnityWarning = styled(Box)({
   top: '5%',
   transform: 'translate(-50%)',
   background: 'white',
-  padding: '10px',
+  padding: pxToRem(10),
   display: 'none',
   zIndex: 10,
 });
@@ -413,6 +414,13 @@ export default function LandingPage() {
   };
 
   useEffect(() => {
+    console.log('LandingPage mounted');
+    const document = window.document;
+    const fontSize = document.documentElement.style.fontSize;
+    console.log('Font size:', fontSize);
+  }, []);
+
+  useEffect(() => {
     if (hasLoadedRef.current) return;
     hasLoadedRef.current = true;
 
@@ -463,6 +471,24 @@ export default function LandingPage() {
     };
   }, []);
 
+  useEffect(() => {
+    setRem();
+    
+    const handleResize = () => {
+      setRem();
+      if (canvasRef.current) {
+        canvasRef.current.style.width = window.innerWidth + "px";
+        canvasRef.current.style.height = window.innerHeight + "px";
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
     <>
       <UnityContainer className="unity-desktop" id="unity-container">
@@ -473,7 +499,7 @@ export default function LandingPage() {
       
       <PageContainer>
         <Header>
-          <Logo src={logoImage} alt="Mirae Studio" />
+          <Logo src={logoImage} alt="Mavae Studio" />
         </Header>
         
         <Content>
