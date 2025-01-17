@@ -1,0 +1,45 @@
+{
+  "name": "niyoko-studio",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.3.0",
+    "@mui/material": "^6.3.0",
+    "@privy-io/react-auth": "^1.99.0",
+    "@privy-io/wagmi": "^0.2.13",
+    "@reduxjs/toolkit": "^2.5.0",
+    "@tanstack/react-query": "^5.62.16",
+    "lottie-react": "^2.4.0",
+    "marked": "^15.0.6",
+    "pusher-js": "^8.4.0-rc2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.1.1",
+    "redux": "^5.0.1",
+    "viem": "^2.21.60",
+    "wagmi": "^2.14.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "^8.18.2",
+    "vite": "^6.0.5"
+  }
+}
