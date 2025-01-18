@@ -45,8 +45,31 @@ const Content = styled(Box)({
   gap: '2rem',
   overflow: 'hidden',
   paddingLeft: '3.75rem',
+  transition: 'padding-left 0.3s ease',
+
+  '@media (min-width: 1440px)': {
+    paddingLeft: 'calc(3.75rem + ((100vw - 1440px) / 480) * 140)',
+  },
+
   '@media (min-width: 1920px)': {
     paddingLeft: '12.5rem',
+  },
+
+  '@media (max-width: 1024px)': {
+    height: 'auto',
+    padding: '2rem 1.5rem',
+    flexDirection: 'column',
+    gap: '3rem',
+  },
+
+  '@media (max-width: 768px)': {
+    padding: '1.5rem 1rem',
+    gap: '2rem',
+  },
+
+  '@media (max-width: 375px)': {
+    padding: '1rem 0.75rem',
+    gap: '1.5rem',
   }
 });
 
@@ -309,10 +332,11 @@ const ApplyButton = styled(Button)({
   top: pxToRem(71),
   width: pxToRem(276),
   height: pxToRem(40),
-  borderRadius: 4,
+  borderRadius: pxToRem(4),
   backgroundColor: 'rgba(0, 0, 0, 0.3)',
   border: '1px solid #FFFFFF',
-  padding: '8px 0px',
+  padding: `${pxToRem(8)} 0px`,
+  margin: 0,
   transition: 'all 0.2s ease',
   color: '#FFFFFF',
   '&:hover': {
