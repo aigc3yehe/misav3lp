@@ -669,12 +669,24 @@ export default function LandingPage() {
   const updateRemainingTime = (createdAt: string) => {
     const lastCreated = new Date(createdAt);
     const now = new Date();
-    const diffHours = (now.getTime() - lastCreated.getTime()) / (1000 * 60 * 60);
+    // const diffHours = (now.getTime() - lastCreated.getTime()) / (1000 * 60 * 60);
     
-    if (diffHours < 24) {
-      const remainingHours = Math.floor(24 - diffHours);
-      const remainingMinutes = Math.floor((24 - diffHours - remainingHours) * 60);
-      setRemainingTime(`${remainingHours}h ${remainingMinutes}m`);
+    // if (diffHours < 24) {
+    //   const remainingHours = Math.floor(24 - diffHours);
+    //   const remainingMinutes = Math.floor((24 - diffHours - remainingHours) * 60);
+    //   setRemainingTime(`${remainingHours}h ${remainingMinutes}m`);
+    //   setIsInputDisabled(true);
+    // } else {
+    //   setRemainingTime('');
+    //   setIsInputDisabled(false);
+    // }
+
+    const diffMinutes = (now.getTime() - lastCreated.getTime()) / (1000 * 60); // 计算分钟差
+  
+    if (diffMinutes < 5) { // 改为5分钟
+      const remainingMinutes = Math.floor(5 - diffMinutes);
+      const remainingSeconds = Math.floor((5 - diffMinutes - remainingMinutes) * 60);
+      setRemainingTime(`${remainingMinutes}m ${remainingSeconds}s`); // 显示分钟和秒
       setIsInputDisabled(true);
     } else {
       setRemainingTime('');
