@@ -774,11 +774,24 @@ export default function LandingPage() {
     if (hasLoadedRef.current) return;
     hasLoadedRef.current = true;
 
+    // 检查移动设备
+    let mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      mobile = true;
+    }
+
+    if (mobile) {
+      const meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+      document.getElementsByTagName('head')[0].appendChild(meta);
+    }
+
     const buildUrl = "/Build";
     const config = {
-      dataUrl: buildUrl + "/d3dcbfc54b31c6bfc2ac5547421341d7.data.unityweb",
-      frameworkUrl: buildUrl + "/886e89956cc645ec2bd4cb9056885f4b.framework.js.unityweb",
-      codeUrl: buildUrl + "/799773a9ce8183130623425262512c2e.wasm.unityweb",
+      dataUrl: buildUrl + "/b2cfe8a20cba3f99743c16eb57092809.data.unityweb",
+      frameworkUrl: buildUrl + "/afa3d23481720312759f4dd4524b1049.framework.js.unityweb",
+      codeUrl: buildUrl + "/15fd025d7a4b13eabaf54869fd3ebdbe.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "DefaultCompany",
       productName: "Create3DSkybox",
@@ -845,8 +858,8 @@ export default function LandingPage() {
 
   return (
     <>
-      <UnityContainer className="unity-desktop" id="unity-container">
-        <UnityCanvas ref={canvasRef} id="unity-canvas" />
+      <UnityContainer className={isMobile ? "unity-mobile" : "unity-desktop"} id="unity-container">
+        <UnityCanvas ref={canvasRef} id="unity-canvas" className={isMobile ? "unity-mobile" : ""} />
         <UnityWarning id="unity-warning" />
         <UnityFooter id="unity-footer" />
         {isUnityLoading && <LoadingState />}
