@@ -1,9 +1,8 @@
 import { Box, Card, Typography, Button, styled, InputBase, Snackbar } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCurrentAgent } from '../store/slices/agentSlice';
 import livingroomIcon from '../assets/livingroom.svg';
 import pointingCursor from '../assets/pointer.png';
+import mobileLine from '../assets/mobile_line.svg';
 import logoImage from '../assets/logo.svg';
 import enterIcon from '../assets/uil_enter.svg';
 import { useState, useEffect, useRef } from 'react';
@@ -22,7 +21,7 @@ const PageContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
-  backgroundColor: 'transparent',
+  backgroundColor: 'rgba(0, 0, 0, 0.25)',
   position: 'relative',
   zIndex: 1,
 
@@ -90,7 +89,7 @@ const ContentInner = styled(Box)({
   height: '100%',
 });
 
-const BackgroundContainer = styled(Box)({
+const BackgroundContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
   top: '19.5rem',
   left: '50%',
@@ -99,7 +98,23 @@ const BackgroundContainer = styled(Box)({
   height: '8.063rem',
   display: 'flex',
   justifyContent: 'center',
-});
+
+  [theme.breakpoints.down('sm')]: {
+    display: 'none', // 在移动端隐藏原来的背景
+  }
+}));
+
+const MobileBackground = styled(Box)(({ }) => ({
+    display: 'block',
+    position: 'absolute',
+    top: pxToRem(316),
+    left: 0,
+    width: pxToRem(390),
+    height: pxToRem(86),
+    zIndex: 0,
+    pointerEvents: 'none',
+  
+}));
 
 const BackgroundLine = styled('img')({
   height: '8.063rem',
@@ -324,7 +339,7 @@ const ActionButton = styled(Button)<{ disabled?: boolean }>(({ disabled, theme }
   justifyContent: 'center',
   gap: 0,
   '&:hover': {
-    backgroundColor: disabled ? '#AAABB4' : '#b8ff66',
+    backgroundColor: disabled ? '#AAABB4' : '#E5FFC9',
   },
 
   [theme.breakpoints.down('sm')]: {
@@ -359,6 +374,7 @@ const agents = [
       description: 'Co-Founder Of Mirae',
       action: 'CHAT',
       wallet_address: '0x900709432a8F2C7E65f90aA7CD35D0afe4eB7169',
+      url: 'https://studiobeta.misato.ai/',
     },
     {
         id: '-1',
@@ -368,6 +384,7 @@ const agents = [
         description: '...',
         action: 'GENERATING',
         wallet_address: '0x1234567890abcdef1234567890abcdef12345678',
+        url: 'https://www.mirae.xyz',
     }
 ];
 
@@ -536,12 +553,60 @@ const UnityWarning = styled(Box)({
   zIndex: 10,
 });
 
+const STYLES = [
+  'M3 Above the Clouds',
+  'M3 Above the Clouds (Featured)',
+  'M3 Advanced (artistic)',
+  'M3 Advanced (photo/render)',
+  'M3 Americana Painting',
+  'M3 Anime',
+  'M3 Cinematic Realism',
+  'M3 Comic',
+  'M3 Concept Render',
+  'M3 Dark Anime Glow',
+  'M3 Detailed Render',
+  'M3 Digital Painting',
+  'M3 Digital Painting (Featured)',
+  'M3 Drone Shot',
+  'M3 Dutch Masters',
+  'M3 Dystopian Render',
+  'M3 Elegant Maximalism',
+  'M3 Elegant Maximalism (Featured)',
+  'M3 Fantasy',
+  'M3 French Comic',
+  'M3 Grunge Pop',
+  'M3 Infrared Photo',
+  'M3 Ink Drawing',
+  'M3 Low-Poly Render',
+  'M3 Magic Realism',
+  'M3 Maximalism Render',
+  'M3 Neo Tokyo',
+  'M3 Open World',
+  'M3 Photoreal',
+  'M3 Photoreal (Featured)',
+  'M3 Playground',
+  'M3 Playground (Featured)',
+  'M3 Psychedelic Illustration',
+  'M3 Psychedelic Painting',
+  'M3 Radiant Painting',
+  'M3 Retro Fantasy',
+  'M3 Retro Fantasy (Featured)',
+  'M3 Scifi Concept Art',
+  'M3 Sky Dome',
+  'M3 Storybook',
+  'M3 Surreal Painting',
+  'M3 UHD Render',
+  'M3 Utopian Render',
+  'M3 Vibrant Anime',
+  'M3 Watercolor'
+];
+
 export default function LandingPage() {
   const [inputValue, setInputValue] = useState('');
   const [focused, setFocused] = useState(false);
   const [isInputDisabled, setIsInputDisabled] = useState(false);
   const [remainingTime, setRemainingTime] = useState<string>('');
-  const navigate = useNavigate();
+  const [lastCreatedAt, setLastCreatedAt] = useState<string | null>(null);
   const dispatch = useDispatch();
   const toast = useSelector((state: RootState) => state.toast);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -549,6 +614,7 @@ export default function LandingPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isUnityLoading, setIsUnityLoading] = useState(true);
+  const [unityInstance, setUnityInstance] = useState<any>(null);
 
   const handleCloseToast = () => {
     dispatch(hideToast());
@@ -558,22 +624,114 @@ export default function LandingPage() {
     setInputValue(event.target.value);
   };
 
-  const handleGenerate = () => {
-    if (!inputValue) return;
-    // 处理生成逻辑
-    dispatch(showToast({
-      message: 'Waiting for response...',
-      severity: 'info'
-    }));
+  const getRandomStyle = () => {
+    const randomIndex = Math.floor(Math.random() * STYLES.length);
+    return STYLES[randomIndex];
   };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleGenerate();
+    }
+  };
+
+  const handleGenerate = () => {
+    if (!inputValue || !unityInstance) return;
+    
+    const randomStyle = getRandomStyle();
+    const message = `${randomStyle}|${inputValue}`;
+    
+    try {
+      unityInstance.SendMessage('Communication', 'Create', message);
+      
+      // 设置当前时间为最新生成时间
+      const now = new Date().toISOString();
+      setLastCreatedAt(now);
+      setIsInputDisabled(true);
+      setInputValue(''); // 清空输入
+      
+      // 开始24小时倒计时
+      updateRemainingTime(now);
+      
+      dispatch(showToast({
+        message: 'Generating skybox...',
+        severity: 'info'
+      }));
+    } catch (error) {
+      console.error('Failed to send message to Unity:', error);
+      dispatch(showToast({
+        message: 'Failed to generate skybox',
+        severity: 'error'
+      }));
+    }
+  };
+
+  const updateRemainingTime = (createdAt: string) => {
+    const lastCreated = new Date(createdAt);
+    const now = new Date();
+    const diffHours = (now.getTime() - lastCreated.getTime()) / (1000 * 60 * 60);
+    
+    if (diffHours < 24) {
+      const remainingHours = Math.floor(24 - diffHours);
+      const remainingMinutes = Math.floor((24 - diffHours - remainingHours) * 60);
+      setRemainingTime(`${remainingHours}h ${remainingMinutes}m`);
+      setIsInputDisabled(true);
+    } else {
+      setRemainingTime('');
+      setIsInputDisabled(false);
+    }
+  };
+
+  // 同时更新本地时间显示和同步后端状态
+  useEffect(() => {
+    if (!lastCreatedAt) return;
+
+    // 每分钟更新显示
+    const displayTimer = setInterval(() => {
+      updateRemainingTime(lastCreatedAt);
+    }, 60000);
+
+    // 每5分钟同步后端状态
+    const syncTimer = setInterval(async () => {
+      try {
+        const response = await getSkyboxStatus();
+        if (response.message === 'success' && response.data?.created_at) {
+          setLastCreatedAt(response.data.created_at);
+          updateRemainingTime(response.data.created_at);
+        }
+      } catch (error) {
+        console.error('Failed to sync skybox status:', error);
+      }
+    }, 5 * 60 * 1000); // 5分钟
+
+    return () => {
+      clearInterval(displayTimer);
+      clearInterval(syncTimer);
+    };
+  }, [lastCreatedAt]);
+
+  // 初始检查状态
+  useEffect(() => {
+    const checkSkyboxStatus = async () => {
+      try {
+        const response: GetSkyboxResponse = await getSkyboxStatus();
+        if (response.message === 'success' && response.data?.created_at) {
+          setLastCreatedAt(response.data.created_at);
+          updateRemainingTime(response.data.created_at);
+        }
+      } catch (error) {
+        console.error('Failed to check skybox status:', error);
+      }
+    };
+
+    checkSkyboxStatus();
+  }, []);
 
   const handleSelectAgent = (agentId: string) => {
     if (agentId === '-1') return; // 如果是不可用状态，直接返回
     const selectedAgent = agents.find(agent => agent.id === agentId);
-    if (selectedAgent) {
-      dispatch(setCurrentAgent(selectedAgent));
-      navigate('/workstation');
-    }
+    // 打开链接
+    window.open(selectedAgent?.url, '_blank');
   };
 
   const capitalizeWords = (text: string) => {
@@ -606,9 +764,9 @@ export default function LandingPage() {
 
     const buildUrl = "/Build";
     const config = {
-      dataUrl: buildUrl + "/c55ba27f9c2de464e740ba62779d8c8e.data.unityweb",
-      frameworkUrl: buildUrl + "/4f65dce89d76c59b372ebfe7267aa8b8.framework.js.unityweb",
-      codeUrl: buildUrl + "/12ef32091c231662520fe414611b9b3c.wasm.unityweb",
+      dataUrl: buildUrl + "/47ae53ab49775c7f51632daa6fe09658.data.unityweb",
+      frameworkUrl: buildUrl + "/886e89956cc645ec2bd4cb9056885f4b.framework.js.unityweb",
+      codeUrl: buildUrl + "/aadc5385c83f44f592694a742edf01e0.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "DefaultCompany",
       productName: "Create3DSkybox",
@@ -623,24 +781,23 @@ export default function LandingPage() {
     script.src = buildUrl + "/9853637125e801e9aae48e78dbbdcfca.loader.js";
     script.onload = async () => {
       try {
-        const unityInstance = await window.createUnityInstance(canvasRef.current, config, (progress: number) => {
+        const instance = await window.createUnityInstance(canvasRef.current, config, (progress: number) => {
           console.log('Unity 加载进度:', progress);
           if (progress === 1) {
             setIsUnityLoading(false);
           }
         });
         
+        setUnityInstance(instance); // 保存unity实例
+        
         if (canvasRef.current) {
           canvasRef.current.style.opacity = '1';
         }
-        
-        setTimeout(() => {
-          unityInstance.SendMessage('Communication', 'Create', "M3 Above the Clouds|Canton Tower");
-        }, 1000);
 
+        instance.SendMessage('Communication', 'Init', "/studio-api");
       } catch (error) {
         console.error('Unity 加载失败:', error);
-        setIsUnityLoading(false); // 加载失败也需要隐藏loading
+        setIsUnityLoading(false);
         unityShowBanner('Unity 加载失败', 'error');
       }
     };
@@ -671,40 +828,6 @@ export default function LandingPage() {
     };
   }, []);
 
-  useEffect(() => {
-    checkSkyboxStatus();
-  }, []);
-
-  const checkSkyboxStatus = async () => {
-    try {
-      const data: GetSkyboxResponse = await getSkyboxStatus();
-      if (data.message === 'success') {
-        if (data.data?.created_at) {
-          const lastCreatedAt = new Date(data.data.created_at);
-          const now = new Date();
-          const diffHours = (now.getTime() - lastCreatedAt.getTime()) / (1000 * 60 * 60);
-          
-          if (diffHours < 24) {
-            setIsInputDisabled(true);
-            // 计算剩余时间
-            const remainingHours = Math.floor(24 - diffHours);
-            const remainingMinutes = Math.floor((24 - diffHours - remainingHours) * 60);
-            setRemainingTime(`${remainingHours}h ${remainingMinutes}m`);
-          } else {
-            setIsInputDisabled(false);
-            setRemainingTime('');
-          }
-        } else {
-          // 第一次生成
-          setIsInputDisabled(false);
-          setRemainingTime('');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to check skybox status:', error);
-    }
-  };
-
   return (
     <>
       <UnityContainer className="unity-desktop" id="unity-container">
@@ -718,6 +841,18 @@ export default function LandingPage() {
         <Header>
           <Logo src={logoImage} alt="Mavae Studio" />
         </Header>
+
+        {isMobile && <MobileBackground>
+          <img 
+            src={mobileLine} 
+            alt="" 
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              objectFit: 'cover' 
+            }} 
+          />
+        </MobileBackground>}
         
         <Content>
           <ContentInner>
@@ -818,6 +953,7 @@ export default function LandingPage() {
               onChange={handleInputChange}
               onFocus={() => !isInputDisabled && setFocused(true)}
               onBlur={() => setFocused(false)}
+              onKeyDown={handleKeyPress}
               disabled={isInputDisabled}
               fullWidth
             />
@@ -825,7 +961,7 @@ export default function LandingPage() {
               hasContent={Boolean(inputValue)}
               onClick={handleGenerate}
               disableRipple
-              disabled={isInputDisabled}
+              disabled={isInputDisabled || !inputValue}
             >
               <EnterIcon src={enterIcon} alt="enter" />
               <ButtonText>

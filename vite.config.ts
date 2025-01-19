@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlcnZpY2UiLCJpYXQiOjE3MzcyNjc3MTN9.4eH6D1kTce5iBTStnihaKFZEC6g6P9Sq2Pp62l7NGPo';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -16,7 +18,14 @@ export default defineConfig({
       '/studio-api': {
         target: 'http://43.153.40.155:5577',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/studio-api/, '')
+        rewrite: (path) => path.replace(/^\/studio-api/, ''),
+        // @ts-ignore
+        configure: (proxy, options) => {
+          // @ts-ignore
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            proxyReq.setHeader('Authorization', `Bearer ${AUTH_TOKEN}`);
+          });
+        }
       }
     }
   },
