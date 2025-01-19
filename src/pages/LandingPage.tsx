@@ -14,6 +14,7 @@ import { setRem, pxToRem } from '../utils/rem';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { getSkyboxStatus, GetSkyboxResponse } from '../services/api';
+import LoadingState from '../components/LoadingState';
 
 const PageContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
@@ -76,12 +77,6 @@ const Content = styled(Box)(({ theme }) => ({
     paddingLeft: '12.5rem',
   },
 
-  '@media (max-width: 1024px)': {
-    height: 'auto',
-    padding: '2rem 1.5rem',
-    flexDirection: 'column',
-    gap: '3rem',
-  },
   [theme.breakpoints.down('sm')]: {
     padding: 0,
     height: 'auto',
@@ -214,10 +209,15 @@ const GenerateButton = styled(Button, {
   }
 }));
 
-const EnterIcon = styled('img')({
+const EnterIcon = styled('img')(({ theme }) => ({
   width: pxToRem(24),
   height: pxToRem(24),
-});
+  marginLeft: pxToRem(16),
+
+  [theme.breakpoints.down('sm')]: {
+    marginLeft: 0,
+  }
+}));
 
 const ButtonText = styled('span')(({ theme }) => ({
   fontSize: pxToRem(18),
@@ -225,6 +225,7 @@ const ButtonText = styled('span')(({ theme }) => ({
   color: '#C7FF8C',
   fontWeight: 400,
   textTransform: 'none',
+  marginRight: pxToRem(16),
 
   [theme.breakpoints.down('sm')]: {
     display: 'none', // 在移动端隐藏文本
@@ -547,6 +548,7 @@ export default function LandingPage() {
   const hasLoadedRef = useRef(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [isUnityLoading, setIsUnityLoading] = useState(true);
 
   const handleCloseToast = () => {
     dispatch(hideToast());
@@ -622,21 +624,23 @@ export default function LandingPage() {
     script.onload = async () => {
       try {
         const unityInstance = await window.createUnityInstance(canvasRef.current, config, (progress: number) => {
-          // 可以在这里添加加载进度的处理
           console.log('Unity 加载进度:', progress);
+          if (progress === 1) {
+            setIsUnityLoading(false);
+          }
         });
         
         if (canvasRef.current) {
           canvasRef.current.style.opacity = '1';
         }
         
-        // 设置默认的skybox
         setTimeout(() => {
           unityInstance.SendMessage('Communication', 'Create', "M3 Above the Clouds|Canton Tower");
         }, 1000);
 
       } catch (error) {
         console.error('Unity 加载失败:', error);
+        setIsUnityLoading(false); // 加载失败也需要隐藏loading
         unityShowBanner('Unity 加载失败', 'error');
       }
     };
@@ -707,6 +711,7 @@ export default function LandingPage() {
         <UnityCanvas ref={canvasRef} id="unity-canvas" />
         <UnityWarning id="unity-warning" />
         <UnityFooter id="unity-footer" />
+        {isUnityLoading && <LoadingState />}
       </UnityContainer>
       
       <PageContainer>
