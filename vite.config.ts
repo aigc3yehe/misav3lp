@@ -19,11 +19,14 @@ export default defineConfig({
         target: 'http://43.153.40.155:5577',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/studio-api/, ''),
-        // @ts-ignore
-        configure: (proxy, options) => {
+        configure: (proxy, _options) => {
           // @ts-ignore
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (proxyReq, _req, _res) => {
             proxyReq.setHeader('Authorization', `Bearer ${AUTH_TOKEN}`);
+          });
+          // @ts-ignore
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            res.setHeader('Authorization', `Bearer ${AUTH_TOKEN}`);
           });
         }
       }
