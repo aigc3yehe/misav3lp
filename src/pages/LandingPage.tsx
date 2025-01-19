@@ -805,8 +805,11 @@ export default function LandingPage() {
         if (canvasRef.current) {
           canvasRef.current.style.opacity = '1';
         }
-
-        instance.SendMessage('Communication', 'Init', "/studio-api");
+        
+        // 延迟半秒
+        setTimeout(() => {
+          instance.SendMessage('Communication', 'Init', "/studio-api");
+        }, 500);
       } catch (error) {
         console.error('Unity 加载失败:', error);
         setIsUnityLoading(false);
