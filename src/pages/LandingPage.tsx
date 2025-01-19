@@ -11,8 +11,11 @@ import lineSvg from '../assets/line.svg';
 import { RootState } from '../store';
 import { hideToast, showToast } from '../store/slices/toastSlice';
 import { setRem, pxToRem } from '../utils/rem';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { getSkyboxStatus, GetSkyboxResponse } from '../services/api';
 
-const PageContainer = styled(Box)({
+const PageContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
   height: '100vh',
   display: 'flex',
@@ -21,22 +24,40 @@ const PageContainer = styled(Box)({
   backgroundColor: 'transparent',
   position: 'relative',
   zIndex: 1,
-});
 
-const Header = styled(Box)({
+  [theme.breakpoints.down('sm')]: {
+    height: '100vh',
+    justifyContent: 'flex-start',
+    gap: pxToRem(30),
+    padding: `0 ${pxToRem(20)}`,
+  }
+}));
+
+const Header = styled(Box)(({ theme }) => ({
   height: '6.44rem',
   width: '100%',
   padding: '1.875rem 2.5rem',
   display: 'flex',
   alignItems: 'center',
-});
 
-const Logo = styled('img')({
+  [theme.breakpoints.down('sm')]: {
+    height: 'auto',
+    padding: 0,
+    marginTop: pxToRem(20), // 给顶部一些间距
+  }
+}));
+
+const Logo = styled('img')(({ theme }) => ({
   width: pxToRem(100),
   height: pxToRem(35),
-});
 
-const Content = styled(Box)({
+  [theme.breakpoints.down('sm')]: {
+    width: pxToRem(68.57),
+    height: pxToRem(24),
+  }
+}));
+
+const Content = styled(Box)(({ theme }) => ({
   height: '37.875rem',
   position: 'relative',
   display: 'flex',
@@ -61,17 +82,12 @@ const Content = styled(Box)({
     flexDirection: 'column',
     gap: '3rem',
   },
-
-  '@media (max-width: 768px)': {
-    padding: '1.5rem 1rem',
+  [theme.breakpoints.down('sm')]: {
+    padding: 0,
+    height: 'auto',
     gap: '2rem',
-  },
-
-  '@media (max-width: 375px)': {
-    padding: '1rem 0.75rem',
-    gap: '1.5rem',
   }
-});
+}));
 
 const ContentInner = styled(Box)({
   position: 'relative',
@@ -104,35 +120,59 @@ const BackgroundLine3 = styled('img')({
   transform: 'translateX(-22.25rem)',
 });
 
-const CardsContainer = styled(Box)({
+const CardsContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
   top: '8.938rem',
   left: '37.938rem',
   display: 'flex',
   gap: '1.563rem',
   zIndex: 1,
-});
 
-const Footer = styled(Box)({
+  [theme.breakpoints.down('sm')]: {
+    position: 'relative',
+    top: 'auto',
+    left: 'auto',
+    width: '100%',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)', // 两列布局
+    gap: pxToRem(16), // 卡片间距16px
+    order: -1, // 移到IntegrationText前面
+  }
+}));
+
+const Footer = styled(Box)(({ theme }) => ({
   height: pxToRem(143),
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-});
+
+  [theme.breakpoints.down('sm')]: {
+    flex: 1,
+    minHeight: 'auto',
+    padding: 0,
+  }
+}));
 
 const InputContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'focused'
-})<{ focused: boolean }>(({ focused }) => ({
+})<{ focused: boolean }>(({ focused, theme }) => ({
   width: pxToRem(874),
   height: pxToRem(63),
-  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  backgroundColor: 'rgba(0, 0, 0, 0.3)', // 修改为30%透明度
   borderRadius: pxToRem(8),
   padding: pxToRem(15) + ' ' + pxToRem(25),
   display: 'flex',
   alignItems: 'center',
   gap: pxToRem(14),
-  border: focused ? '1px solid #C9ACFF' : '1px solid rgba(0, 0, 0, 0.8)',
+  border: focused ? '1px solid #C9ACFF' : '1px solid rgba(0, 0, 0, 0.3)', // 边框也使用相同透明度
   transition: 'border 0.2s ease',
+
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    height: pxToRem(48),
+    padding: `${pxToRem(12)} ${pxToRem(16)}`,
+    gap: pxToRem(8),
+  }
 }));
 
 const StyledInput = styled(InputBase)({
@@ -147,20 +187,31 @@ const StyledInput = styled(InputBase)({
 });
 
 const GenerateButton = styled(Button, {
-  shouldForwardProp: (prop) => prop !== 'hasContent'
-})<{ hasContent: boolean }>(({ hasContent }) => ({
+  shouldForwardProp: (prop) => !['hasContent', 'disabled'].includes(prop as string)
+})<{ hasContent: boolean; disabled?: boolean }>(({ hasContent, disabled, theme }) => ({
   width: pxToRem(141),
   height: pxToRem(35),
   borderRadius: pxToRem(4),
-  backgroundColor: hasContent ? 'rgba(199, 255, 140, 0.1)' : 'transparent',
+  backgroundColor: disabled 
+    ? 'rgba(170, 171, 180, 0.1)' 
+    : (hasContent ? 'rgba(199, 255, 140, 0.1)' : 'transparent'),
   display: 'flex',
   alignItems: 'center',
   gap: pxToRem(8),
   padding: pxToRem(5) + ' ' + pxToRem(16),
   textTransform: 'none',
+  opacity: disabled ? 0.5 : 1,
   '&:hover': {
-    backgroundColor: hasContent ? 'rgba(199, 255, 140, 0.2)' : 'transparent',
+    backgroundColor: disabled 
+      ? 'rgba(170, 171, 180, 0.1)' 
+      : (hasContent ? 'rgba(199, 255, 140, 0.2)' : 'transparent'),
   },
+
+  [theme.breakpoints.down('sm')]: {
+    width: 'auto',
+    padding: 0,
+    minWidth: 'unset',
+  }
 }));
 
 const EnterIcon = styled('img')({
@@ -168,15 +219,19 @@ const EnterIcon = styled('img')({
   height: pxToRem(24),
 });
 
-const ButtonText = styled('span')({
+const ButtonText = styled('span')(({ theme }) => ({
   fontSize: pxToRem(18),
   lineHeight: '140%',
   color: '#C7FF8C',
   fontWeight: 400,
   textTransform: 'none',
-});
 
-const AgentCard = styled(Card)({
+  [theme.breakpoints.down('sm')]: {
+    display: 'none', // 在移动端隐藏文本
+  }
+}));
+
+const AgentCard = styled(Card)(({ theme }) => ({
   width: '20.75rem',
   height: '22.688rem',
   padding: '1.25rem',
@@ -193,41 +248,72 @@ const AgentCard = styled(Card)({
   display: 'flex',
   flexDirection: 'column',
   gap: 0,
-});
 
-const AgentImage = styled('img')({
+  [theme.breakpoints.down('sm')]: {
+    width: pxToRem(167),
+    height: pxToRem(196),
+    padding: pxToRem(10),
+    backgroundSize: `${pxToRem(40)} ${pxToRem(40)}`, // 缩小背景图案
+    backgroundPosition: `${pxToRem(20)} 0, ${pxToRem(20)} 0, 0 0, 0 0`,
+  }
+}));
+
+const AgentImage = styled('img')(({ theme }) => ({
   width: pxToRem(292),
   height: pxToRem(200),
   borderRadius: pxToRem(4),
   objectFit: 'cover',
   display: 'block',
-});
 
-const TextContent = styled(Box)({
+  [theme.breakpoints.down('sm')]: {
+    width: pxToRem(147),
+    height: pxToRem(101),
+  }
+}));
+
+const TextContent = styled(Box)(({ theme }) => ({
   width: pxToRem(292),
   height: pxToRem(73),
-  padding: pxToRem(10) + ' ' + 0,
+  padding: `${pxToRem(10)} 0`,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
-});
 
-const AgentName = styled(Typography)({
+  [theme.breakpoints.down('sm')]: {
+    width: pxToRem(147),
+    height: pxToRem(40),
+    gap: pxToRem(2),
+    padding: `${pxToRem(8)} 0`,
+  }
+}));
+
+const AgentName = styled(Typography)(({ theme }) => ({
   fontSize: pxToRem(30),
   lineHeight: pxToRem(24),
   fontWeight: 'bold',
   color: '#000000',
-});
 
-const AgentDescription = styled(Typography)({
+  [theme.breakpoints.down('sm')]: {
+    fontSize: pxToRem(18),
+    fontWeight: 800,
+    lineHeight: pxToRem(12.1),
+  }
+}));
+
+const AgentDescription = styled(Typography)(({ theme }) => ({
   fontSize: pxToRem(18),
   lineHeight: pxToRem(24),
   fontWeight: 500,
   color: '#000000',
-});
 
-const ActionButton = styled(Button)<{ disabled?: boolean }>(({ disabled }) => ({
+  [theme.breakpoints.down('sm')]: {
+    fontSize: pxToRem(10),
+    lineHeight: pxToRem(12.1),
+  }
+}));
+
+const ActionButton = styled(Button)<{ disabled?: boolean }>(({ disabled, theme }) => ({
   width: pxToRem(292),
   height: pxToRem(50),
   borderRadius: pxToRem(4),
@@ -239,13 +325,23 @@ const ActionButton = styled(Button)<{ disabled?: boolean }>(({ disabled }) => ({
   '&:hover': {
     backgroundColor: disabled ? '#AAABB4' : '#b8ff66',
   },
+
+  [theme.breakpoints.down('sm')]: {
+    width: pxToRem(147),
+    height: pxToRem(31),
+  }
 }));
 
-const ActionText = styled(Typography)<{ disabled?: boolean }>(({ disabled }) => ({
+const ActionText = styled(Typography)<{ disabled?: boolean }>(({ disabled, theme }) => ({
   fontSize: pxToRem(20),
   lineHeight: pxToRem(24),
   fontWeight: 'bold',
   color: disabled ? '#636071' : '#000000',
+
+  [theme.breakpoints.down('sm')]: {
+    fontSize: pxToRem(14),
+    lineHeight: pxToRem(16),
+  }
 }));
 
 const ActionIcon = styled('img')({
@@ -274,32 +370,48 @@ const agents = [
     }
 ];
 
-const TextContainer = styled(Box)({
+const TextContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
   top: 0,
   left: 0,
   display: 'flex',
   flexDirection: 'column',
-});
 
-const TitleContainer = styled(Box)({
+  [theme.breakpoints.down('sm')]: {
+    position: 'relative',
+    width: '100%',
+    padding: `${pxToRem(20)} 0`,
+    gap: 0,
+  }
+}));
+
+const TitleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   marginBottom: pxToRem(24),
-});
 
-const TitleText = styled(Typography)({
+  [theme.breakpoints.down('sm')]: {
+    marginBottom: pxToRem(8),
+  }
+}));
+
+const TitleText = styled(Typography)(({ theme }) => ({
   fontSize: pxToRem(80),
   lineHeight: '110%',
   fontWeight: 800,
   color: '#FFFFFF',
-});
+
+  [theme.breakpoints.down('sm')]: {
+    fontSize: pxToRem(45),
+    lineHeight: '110%',
+  }
+}));
 
 const HighlightText = styled('span')({
   color: '#C9ACFF',
 });
 
-const DescriptionText = styled(Typography)({
+const DescriptionText = styled(Typography)(({ theme }) => ({
   position: 'absolute',
   top: pxToRem(336),
   left: 0,
@@ -313,9 +425,18 @@ const DescriptionText = styled(Typography)({
   '& span': {
     fontWeight: 400,
   },
-});
 
-const IntegrationText = styled(Typography)({
+  [theme.breakpoints.down('sm')]: {
+    position: 'relative',
+    top: 'auto',
+    left: 'auto',
+    width: '100%',
+    fontSize: pxToRem(14),
+    lineHeight: '140%',
+  }
+}));
+
+const IntegrationText = styled(Typography)(({ theme }) => ({
   position: 'absolute',
   left: pxToRem(607),
   top: pxToRem(10),
@@ -324,9 +445,22 @@ const IntegrationText = styled(Typography)({
   lineHeight: '140%',
   fontWeight: 400,
   color: '#FFFFFF',
-});
 
-const ApplyButton = styled(Button)({
+  [theme.breakpoints.down('sm')]: {
+    position: 'relative',
+    left: 'auto',
+    top: 'auto',
+    marginTop: pxToRem(40),
+    width: '100%',
+    // 不居中，靠左
+    textAlign: 'left',
+    fontSize: pxToRem(14),
+    lineHeight: '140%',
+    order: 0,
+  }
+}));
+
+const ApplyButton = styled(Button)(({ theme }) => ({
   position: 'absolute',
   left: pxToRem(607),
   top: pxToRem(71),
@@ -344,15 +478,31 @@ const ApplyButton = styled(Button)({
     border: '1px solid #C7FF8C',
     color: '#C7FF8C',
   },
-});
 
-const ApplyButtonText = styled(Typography)({
+  [theme.breakpoints.down('sm')]: {
+    position: 'relative',
+    left: 'auto',
+    top: 'auto',
+    width: 'auto', // 适应内容，不需要填满
+    height: 'auto',
+    marginTop: pxToRem(11),
+    padding: `${pxToRem(8)} ${pxToRem(12)}`,
+    order: 1,
+  }
+}));
+
+const ApplyButtonText = styled(Typography)(({ theme }) => ({
   fontSize: pxToRem(20),
   lineHeight: '100%',
   fontWeight: 500,
   color: 'inherit',
   textTransform: 'none',
-});
+
+  [theme.breakpoints.down('sm')]: {
+    fontSize: pxToRem(14),
+    lineHeight: '100%',
+  }
+}));
 
 const UnityContainer = styled('div')({
   position: 'fixed',
@@ -388,11 +538,15 @@ const UnityWarning = styled(Box)({
 export default function LandingPage() {
   const [inputValue, setInputValue] = useState('');
   const [focused, setFocused] = useState(false);
+  const [isInputDisabled, setIsInputDisabled] = useState(false);
+  const [remainingTime, setRemainingTime] = useState<string>('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const toast = useSelector((state: RootState) => state.toast);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hasLoadedRef = useRef(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleCloseToast = () => {
     dispatch(hideToast());
@@ -496,10 +650,10 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    setRem();
+    setRem(isMobile);
     
     const handleResize = () => {
-      setRem();
+      setRem(isMobile);
       if (canvasRef.current) {
         canvasRef.current.style.width = window.innerWidth + "px";
         canvasRef.current.style.height = window.innerHeight + "px";
@@ -512,6 +666,40 @@ export default function LandingPage() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    checkSkyboxStatus();
+  }, []);
+
+  const checkSkyboxStatus = async () => {
+    try {
+      const data: GetSkyboxResponse = await getSkyboxStatus();
+      if (data.message === 'success') {
+        if (data.data?.created_at) {
+          const lastCreatedAt = new Date(data.data.created_at);
+          const now = new Date();
+          const diffHours = (now.getTime() - lastCreatedAt.getTime()) / (1000 * 60 * 60);
+          
+          if (diffHours < 24) {
+            setIsInputDisabled(true);
+            // 计算剩余时间
+            const remainingHours = Math.floor(24 - diffHours);
+            const remainingMinutes = Math.floor((24 - diffHours - remainingHours) * 60);
+            setRemainingTime(`${remainingHours}h ${remainingMinutes}m`);
+          } else {
+            setIsInputDisabled(false);
+            setRemainingTime('');
+          }
+        } else {
+          // 第一次生成
+          setIsInputDisabled(false);
+          setRemainingTime('');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check skybox status:', error);
+    }
+  };
 
   return (
     <>
@@ -543,36 +731,69 @@ export default function LandingPage() {
               </DescriptionText>
             </TextContainer>
 
-            <IntegrationText>
-              Mirae will boost your agent's abilities, making it stronger! Any agent can be integrated !
-            </IntegrationText>
-
-            <ApplyButton disableRipple>
-              <ApplyButtonText>Apply For Integration &gt;</ApplyButtonText>
-            </ApplyButton>
-
-            <CardsContainer>
-              {agents.map((agent) => (
-                <AgentCard key={agent.id} onClick={() => handleSelectAgent(agent.id)}>
-                  <AgentImage src={agent.avatar} alt={agent.name} />
-                  <TextContent>
-                    <AgentName>{agent.name}</AgentName>
-                    <AgentDescription>{agent.description}</AgentDescription>
-                  </TextContent>
-                  <ActionButton 
-                    disabled={agent.id === '-1'}
-                    disableRipple={agent.id === '-1'}
-                  >
-                    {agent.id !== '-1' && (
-                      <ActionIcon src={livingroomIcon} alt="chat" />
-                    )}
-                    <ActionText disabled={agent.id === '-1'}>
-                      {agent.action}
-                    </ActionText>
-                  </ActionButton>
-                </AgentCard>
-              ))}
-            </CardsContainer>
+            {isMobile ? (
+              <>
+                <CardsContainer>
+                  {agents.map((agent) => (
+                    <AgentCard key={agent.id} onClick={() => handleSelectAgent(agent.id)}>
+                      <AgentImage src={agent.avatar} alt={agent.name} />
+                      <TextContent>
+                        <AgentName>{agent.name}</AgentName>
+                        <AgentDescription>{agent.description}</AgentDescription>
+                      </TextContent>
+                      <ActionButton 
+                        disabled={agent.id === '-1'}
+                        disableRipple={agent.id === '-1'}
+                      >
+                        {agent.id !== '-1' && (
+                          <ActionIcon src={livingroomIcon} alt="chat" />
+                        )}
+                        <ActionText disabled={agent.id === '-1'}>
+                          {agent.action}
+                        </ActionText>
+                      </ActionButton>
+                    </AgentCard>
+                  ))}
+                </CardsContainer>
+                <IntegrationText>
+                  Mirae will boost your agent's abilities, making it stronger! Any agent can be integrated !
+                </IntegrationText>
+                <ApplyButton disableRipple>
+                  <ApplyButtonText>Apply For Integration &gt;</ApplyButtonText>
+                </ApplyButton>
+              </>
+            ) : (
+              <>
+                <IntegrationText>
+                  Mirae will boost your agent's abilities, making it stronger! Any agent can be integrated !
+                </IntegrationText>
+                <ApplyButton disableRipple>
+                  <ApplyButtonText>Apply For Integration &gt;</ApplyButtonText>
+                </ApplyButton>
+                <CardsContainer>
+                  {agents.map((agent) => (
+                    <AgentCard key={agent.id} onClick={() => handleSelectAgent(agent.id)}>
+                      <AgentImage src={agent.avatar} alt={agent.name} />
+                      <TextContent>
+                        <AgentName>{agent.name}</AgentName>
+                        <AgentDescription>{agent.description}</AgentDescription>
+                      </TextContent>
+                      <ActionButton 
+                        disabled={agent.id === '-1'}
+                        disableRipple={agent.id === '-1'}
+                      >
+                        {agent.id !== '-1' && (
+                          <ActionIcon src={livingroomIcon} alt="chat" />
+                        )}
+                        <ActionText disabled={agent.id === '-1'}>
+                          {agent.action}
+                        </ActionText>
+                      </ActionButton>
+                    </AgentCard>
+                  ))}
+                </CardsContainer>
+              </>
+            )}
           </ContentInner>
 
           <BackgroundContainer>
@@ -585,17 +806,21 @@ export default function LandingPage() {
         <Footer>
           <InputContainer focused={focused}>
             <StyledInput
-              placeholder="Type your prompt here..."
+              placeholder={isInputDisabled 
+                ? `Next generation available in ${remainingTime}` 
+                : "Type your prompt here..."}
               value={inputValue}
               onChange={handleInputChange}
-              onFocus={() => setFocused(true)}
+              onFocus={() => !isInputDisabled && setFocused(true)}
               onBlur={() => setFocused(false)}
+              disabled={isInputDisabled}
               fullWidth
             />
             <GenerateButton
               hasContent={Boolean(inputValue)}
               onClick={handleGenerate}
               disableRipple
+              disabled={isInputDisabled}
             >
               <EnterIcon src={enterIcon} alt="enter" />
               <ButtonText>
