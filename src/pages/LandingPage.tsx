@@ -789,9 +789,9 @@ export default function LandingPage() {
 
     const buildUrl = "/Build";
     const config = {
-      dataUrl: buildUrl + "/b2cfe8a20cba3f99743c16eb57092809.data.unityweb",
-      frameworkUrl: buildUrl + "/afa3d23481720312759f4dd4524b1049.framework.js.unityweb",
-      codeUrl: buildUrl + "/15fd025d7a4b13eabaf54869fd3ebdbe.wasm.unityweb",
+      dataUrl: buildUrl + "/54272a652be5a5c3b0837a7c708041e6.data.unityweb",
+      frameworkUrl: buildUrl + "/e414ee8af60000ad21ea37102851b5c1.framework.js.unityweb",
+      codeUrl: buildUrl + "/5b745c8268e9796b0c735f263668fdd2.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "DefaultCompany",
       productName: "Create3DSkybox",
