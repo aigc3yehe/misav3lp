@@ -371,7 +371,7 @@ const agents = [
       name: 'MISATO',
       avatar: '/misato.jpg',
       address: '0xabcdef1234567890abcdef1234567890abcdef12',
-      description: 'Co-Founder Of Mirae',
+      description: 'The first agent in MAVAE',
       action: 'CHAT',
       wallet_address: '0x900709432a8F2C7E65f90aA7CD35D0afe4eB7169',
       url: 'https://studiobeta.misato.ai/',
@@ -398,7 +398,7 @@ const TextContainer = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     position: 'relative',
     width: '100%',
-    padding: `${pxToRem(20)} 0`,
+    padding: `${pxToRem(10)} 0 ${pxToRem(30)} 0`,
     gap: 0,
   }
 }));
@@ -415,7 +415,7 @@ const TitleContainer = styled(Box)(({ theme }) => ({
 
 const TitleText = styled(Typography)(({ theme }) => ({
   fontSize: pxToRem(80),
-  lineHeight: '110%',
+  lineHeight: '105%',
   fontWeight: 800,
   color: '#FFFFFF',
 
@@ -431,7 +431,7 @@ const HighlightText = styled('span')({
 
 const DescriptionText = styled(Typography)(({ theme }) => ({
   position: 'absolute',
-  top: pxToRem(336),
+  top: pxToRem(364),
   left: 0,
   display: 'flex',
   flexDirection: 'column',
@@ -789,9 +789,9 @@ export default function LandingPage() {
 
     const buildUrl = "/Build";
     const config = {
-      dataUrl: buildUrl + "/54272a652be5a5c3b0837a7c708041e6.data.unityweb",
-      frameworkUrl: buildUrl + "/e414ee8af60000ad21ea37102851b5c1.framework.js.unityweb",
-      codeUrl: buildUrl + "/5b745c8268e9796b0c735f263668fdd2.wasm.unityweb",
+      dataUrl: buildUrl + "/64a9c23a2709e7e855270db717a772dc.data.unityweb",
+      frameworkUrl: buildUrl + "/8b955db0fb0c822bcf76b509112e8905.framework.js.unityweb",
+      codeUrl: buildUrl + "/f044eee73ee7c9f86ffe058564a4484a.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "DefaultCompany",
       productName: "Create3DSkybox",
@@ -822,6 +822,7 @@ export default function LandingPage() {
         // 延迟半秒
         setTimeout(() => {
           instance.SendMessage('Communication', 'Init', "/studio-api");
+          instance.SendMessage('Rotation', 'Init', "3.0");
         }, 500);
       } catch (error) {
         console.error('Unity 加载失败:', error);
@@ -886,15 +887,16 @@ export default function LandingPage() {
           <ContentInner>
             <TextContainer>
               <TitleContainer>
-                <TitleText>A STUDIO</TitleText>
-                <TitleText>COMPOSED OF</TitleText>
+                <TitleText>AN AGENTIC </TitleText>
+                <TitleText>STUDIO FOR</TitleText>
+                <TitleText>CREATING</TitleText>
                 <TitleText>
-                  <HighlightText>AGENTS !</HighlightText>
+                  <HighlightText>NEW WORLDS</HighlightText>
                 </TitleText>
               </TitleContainer>
               <DescriptionText>
                 {capitalizeWords(
-                  'Provides interfaces for interacting with agents and various tools needed for agents to complete tasks.'
+                  'Provides interfaces for interacting with agents and various AIGC tools necessary for agents to complete generative tasks.'
                 )}
               </DescriptionText>
             </TextContainer>
@@ -924,7 +926,7 @@ export default function LandingPage() {
                   ))}
                 </CardsContainer>
                 <IntegrationText>
-                  Mirae will boost your agent's abilities, making it stronger! Any agent can be integrated !
+                  MAVAE Studio will boost your agent's abilities, making it stronger! Any agent can be integrated !
                 </IntegrationText>
                 <ApplyButton disableRipple>
                   <ApplyButtonText>Apply For Integration &gt;</ApplyButtonText>
@@ -933,7 +935,7 @@ export default function LandingPage() {
             ) : (
               <>
                 <IntegrationText>
-                  Mirae will boost your agent's abilities, making it stronger! Any agent can be integrated !
+                  MAVAE Studio will boost your agent's abilities, making it stronger! Any agent can be integrated !
                 </IntegrationText>
                 <ApplyButton disableRipple>
                   <ApplyButtonText>Apply For Integration &gt;</ApplyButtonText>
