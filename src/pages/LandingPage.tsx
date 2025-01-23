@@ -745,7 +745,7 @@ export default function LandingPage() {
   };
 
   const unityShowBanner = (msg: string, type: 'error' | 'warning') => {
-    console.log('Unity 加载进度:', msg, type);
+    console.log('Unity progress:', msg, type);
   };
 
   const handleResize = () => {
@@ -799,7 +799,7 @@ export default function LandingPage() {
     script.onload = async () => {
       try {
         const instance = await window.createUnityInstance(canvasRef.current, config, (progress: number) => {
-          console.log('Unity 加载进度:', progress);
+          console.log('Unity progress:', progress);
           if (progress === 1) {
             setIsUnityLoading(false);
           }
@@ -817,9 +817,9 @@ export default function LandingPage() {
           instance.SendMessage('Rotation', 'Init', "3.0");
         }, 500);
       } catch (error) {
-        console.error('Unity 加载失败:', error);
+        console.error('Unity error:', error);
         setIsUnityLoading(false);
-        unityShowBanner('Unity 加载失败', 'error');
+        unityShowBanner('Unity error', 'error');
       }
     };
 
